@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    height: 90vh; /* Adjust as needed to fit the desired height */
+    width: 100vw; /* Make container full width */
+  }
+  
+  #filters {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .filter-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .filter-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .checkbox-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  
+  .plot-container {
+    flex: 1;
+    height: 100%;
+    width: 100%; /* Expand to full width */
+    max-width: 700px; /* Set a maximum width */
+    max-height:1200px ;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: auto;
+    min-height: 500px;
+  }
+  
+  .indicator-button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .indicator-button:hover {
+    background-color: #ccc;
+  }
+  
+  .legend {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+  }
+  
+  .legend rect {
+    stroke-width: 2;
+  }
+  
+  .legend text {
+    fill: #000;
+  }
+  
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
