@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer and Intro</title>
+    <style>
+        body {
+            background: #2c2c2c;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            width: 60%;
+        }
+        .fade {
+            animation: fadeIn 3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .gloomy {
+            background: linear-gradient(145deg, #1a1a1a, #2f2f2f);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .hidden {
+            display: none;
+        }
+        .option {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #444;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .option:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container gloomy">
+        <div id="disclaimer" class="fade"></div>
+        <div id="intro" class="hidden">
+            <p id="introText"></p>
+            <button class="option" onclick="window.location.href='trendy.html'">Explore</button>
+            
+        </div>
+    </div>
+
+    <script>
+        const disclaimerElement = document.getElementById('disclaimer');
+        const introElement = document.getElementById('intro');
+        const introTextElement = document.getElementById('introText');
+        const disclaimerText = "Disclaimer: This is a class assignment,<br>and is not created to convey any political or biased information<br>but is only created as a task to improve visualization skills.";
+        const introText = "Welcome to the narrative visualization.<br>With racing human development, priorities of people has been rapidly changing, unlike years ago, when inhibiting lands was a mere choice of travelling, current area requires extensive research to match ones priorities with destination country's plans and future.<br>This is an opportunity to explore a possible future.<br>Choose wisely:";
+        const pauseAfterDisclaimer = disclaimerText.replace(/<br>/g, ""); // Text after which to pause
+
+        function fadeOut(element, callback) {
+            element.style.transition = "opacity 2s";
+            element.style.opacity = 0;
+            setTimeout(() => {
+                element.classList.add('hidden');
+                callback();
+            }, 2000);
+        }
+
+        function fadeIn(element) {
+            element.classList.remove('hidden');
+            element.classList.add('fade');
+        }
+
+        function typeText(element, text, speed, callback) {
+            let index = 0;
+            function type() {
+                if (index < text.length) {
+                    if (text.slice(index, index + 4) === "<br>") {
+                        element.innerHTML += "<br>";
+                        index += 4;
+                    } else {
+                        element.innerHTML += text.charAt(index);
+                        index++;
+                    }
+                    if (element.innerText === pauseAfterDisclaimer) {
+                        setTimeout(() => {
+                            element.style.color = "red";
+                            setTimeout(type, 2000); // Pause for 2 seconds
+                        }, 1000); // Pause for 1 second before changing color
+                    } else {
+                        setTimeout(type, speed);
+                    }
+                } else {
+                    callback();
+                }
+            }
+            type();
+        }
+
+        setTimeout(() => {
+            typeText(disclaimerElement, disclaimerText, 50, () => {
+                setTimeout(() => {
+                    fadeOut(disclaimerElement, () => {
+                        fadeIn(introElement);
+                        typeText(introTextElement, introText, 50, () => {
+                            // Typing complete
+                        });
+                    });
+                }, 2000); // Pause for 2 seconds before fading out disclaimer
+            });
+        }, 3000); // 3 seconds before starting to type disclaimer
+    </script>
+</body>
+</html>

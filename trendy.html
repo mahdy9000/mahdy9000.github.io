@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trendy Countries (2004-2023)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+    }
+
+    .chart {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 50px;
+    }
+
+    .year-circle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+      position: relative;
+    }
+
+    .year-circle circle {
+      cursor: pointer;
+    }
+
+    .year-circle text {
+      margin-top: 10px;
+      pointer-events: none; /* Ensure text does not interfere with hover */
+    }
+
+    .tooltip {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .button-container {
+      margin-top: 20px;
+    }
+
+    .continue-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .continue-button:hover {
+      background-color: #0056b3;
+    }
+
+    .description {
+      max-width: 800px;
+      margin: 20px;
+      text-align: left;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Trendy Countries (2004-2023)</h1>
+    <p class="description">
+      Each year, a country takes public attention by demonstrating excellence and brilliance in a specific aspect of life. For the last 20 years, these countries were the trending for their achievements, and the focus of the country can ease one's immigration. (Hover over for more info)
+    </p>
+    <div class="chart" id="chart"></div>
+    <div class="button-container">
+      <button class="continue-button" onclick="window.location.href='leaders.html'">Continue Exploration</button>
+    </div>
+  </div>
+  <script>
+    const data = [
+      { year: 2004, country: "Ireland", reason: "Rapid economic growth, known as the 'Celtic Tiger,' driven by foreign direct investment and a booming technology sector.", color: "#FF5733" },
+      { year: 2005, country: "China", reason: "Continued massive economic expansion and becoming a major player in global trade and manufacturing.", color: "#33FF57" },
+      { year: 2006, country: "United Arab Emirates", reason: "Burj Khalifa construction and rapid modernization of Dubai, turning it into a global business hub.", color: "#3357FF" },
+      { year: 2007, country: "Singapore", reason: "Strong economic performance, high standard of living, and becoming a key financial center in Asia.", color: "#FF33A1" },
+      { year: 2008, country: "Norway", reason: "Topping the Human Development Index (HDI) and high quality of life with strong social welfare programs.", color: "#FFA133" },
+      { year: 2009, country: "Australia", reason: "Robust economic resilience during the global financial crisis and high quality of life.", color: "#33FFD5" },
+      { year: 2010, country: "Brazil", reason: "Hosting the World Cup and Olympics preparations, showcasing rapid economic growth and cultural vibrancy.", color: "#D533FF" },
+      { year: 2011, country: "Qatar", reason: "Winning the bid to host the 2022 FIFA World Cup and massive infrastructure investments.", color: "#FF5733" },
+      { year: 2012, country: "Switzerland", reason: "High rankings in global competitiveness, quality of life, and strong financial sector.", color: "#33FF57" },
+      { year: 2013, country: "Germany", reason: "Strong economic performance, leadership in the EU, and hosting major international events.", color: "#3357FF" },
+      { year: 2014, country: "Canada", reason: "High quality of life, welcoming immigration policies, and strong economic performance.", color: "#FF33A1" },
+      { year: 2015, country: "Sweden", reason: "Leading in innovation, environmental sustainability, and high quality of life.", color: "#FFA133" },
+      { year: 2016, country: "Japan", reason: "Preparing for the Tokyo 2020 Olympics, showcasing technological advancements and cultural heritage.", color: "#33FFD5" },
+      { year: 2017, country: "New Zealand", reason: "High rankings in ease of doing business, quality of life, and natural beauty.", color: "#D533FF" },
+      { year: 2018, country: "Finland", reason: "Topping the World Happiness Report and excellence in education and social welfare.", color: "#FF5733" },
+      { year: 2019, country: "South Korea", reason: "Leading in technology and innovation, cultural influence through K-pop and cinema (e.g., 'Parasite' winning Oscars).", color: "#33FF57" },
+      { year: 2020, country: "Taiwan", reason: "Effective handling of the COVID-19 pandemic and technological advancements.", color: "#3357FF" },
+      { year: 2021, country: "Vietnam", reason: "Rapid economic growth, handling of the COVID-19 pandemic, and becoming a manufacturing hub.", color: "#FF33A1" },
+      { year: 2022, country: "United Kingdom", reason: "Hosting major global events (e.g., COP26), strong cultural influence, and economic resilience post-Brexit.", color: "#FFA133" },
+      { year: 2023, country: "India", reason: "Rapid economic growth, advancements in technology, and increasing global influence in various sectors.", color: "#33FFD5" },
+    ];
+
+    const width = 800;
+    const height = 600;
+    const circleRadius = 40;
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip");
+
+    const yearCircles = svg.selectAll(".year-circle")
+      .data(data)
+      .enter()
+      .append("g")
+      .attr("class", "year-circle")
+      .attr("transform", (d, i) => `translate(${(i % 5) * 160 + 80}, ${Math.floor(i / 5) * 160 + 80})`);
+
+    yearCircles.append("circle")
+      .attr("r", circleRadius)
+      .attr("fill", d => d.color)
+      .on("mouseover", (event, d) => {
+        tooltip.transition().duration(200).style("opacity", 1);
+        tooltip.html(`<strong>${d.year}</strong><br><strong>${d.country}</strong><br>${d.reason}`)
+          .style("left", `${event.pageX + 10}px`)
+          .style("top", `${event.pageY - 28}px`);
+      })
+      .on("mouseout", () => {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
+
+    yearCircles.append("text")
+      .attr("y", 5)
+      .attr("text-anchor", "middle")
+      .attr("fill", "black")
+      .text(d => d.country);
+
+    yearCircles.append("text")
+      .attr("y", circleRadius + 20)
+      .attr("text-anchor", "middle")
+      .attr("fill", "black")
+      .text(d => d.year);
+
+  </script>
+</body>
+</html>

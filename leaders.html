@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wellbeing Indicator Wheel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      margin: 20px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    .description {
+      max-width: 800px;
+      margin: 20px;
+    }
+
+    .wheel-container {
+      margin: 20px auto;
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+
+    .plot-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .filter-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      width: 300px;
+    }
+
+    .filter-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .button-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .plot-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      margin: 5px;
+    }
+
+    .plot-button:hover {
+      background-color: #0056b3;
+    }
+
+    .plot-area {
+      width: 100%;
+      height: 600px;
+      margin-top: 20px;
+    }
+
+    .next-page-button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      margin: 20px;
+    }
+
+    .next-page-button:hover {
+      background-color: #218838;
+    }
+
+  </style>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="description">
+      <h1>Wellbeing Indicator Wheel</h1>
+      <p>
+        When considering where to live, several important aspects of life must be taken into account to ensure overall wellbeing. These include:
+        <ul>
+          <li>Economic Stability</li>
+          <li>Healthcare Quality</li>
+          <li>Education Quality</li>
+          <li>Safety and Security</li>
+          <li>Environmental Quality</li>
+        </ul>
+        By evaluating these aspects, one can determine the best places to live that offer a balanced and fulfilling life.
+      </p>
+    </div>
+    <div class="wheel-container" id="wheel-container"></div>
+    <div class="plot-container">
+      <div class="filter-box">
+        <div class="filter-title">Performance of top 10 countries</div>
+        <div id="indicator-buttons" class="button-container"></div>
+      </div>
+      <div class="plot-area" id="plot-area"></div>
+      <button class="next-page-button" onclick="window.location.href='index.html'">Go to Next Page</button>
+    </div>
+  </div>
+
+  <script>
+    // Wellbeing Indicator Wheel
+    const wheelData = [
+      { category: "Economic Stability", value: 9 },
+      { category: "Healthcare Quality", value: 8 },
+      { category: "Education Quality", value: 7 },
+      { category: "Safety and Security", value: 6 },
+      { category: "Environmental Quality", value: 8 },
+    ];
+
+    const wheelWidth = 400;
+    const wheelHeight = 400;
+    const wheelRadius = Math.min(wheelWidth, wheelHeight) / 2 - 40;
+
+    const svgWheel = d3.select("#wheel-container")
+      .append("svg")
+      .attr("width", wheelWidth)
+      .attr("height", wheelHeight)
+      .append("g")
+      .attr("transform", `translate(${wheelWidth / 2},${wheelHeight / 2})`);
+
+    const angleScale = d3.scaleLinear()
+      .domain([0, wheelData.length])
+      .range([0, 2 * Math.PI]);
+
+    const radiusScale = d3.scaleLinear()
+      .domain([0, 10])
+      .range([0, wheelRadius]);
+
+    const arc = d3.arc()
+      .innerRadius(0)
+      .outerRadius(d => radiusScale(d.value))
+      .startAngle((d, i) => angleScale(i))
+      .endAngle((d, i) => angleScale(i + 1))
+      .padAngle(0.01)
+      .padRadius(100)
+      .cornerRadius(4);
+
+    svgWheel.selectAll("path")
+      .data(wheelData)
+      .enter()
+      .append("path")
+      .attr("d", arc)
+      .attr("fill", (d, i) => d3.schemeCategory10[i % 10]);
+
+    svgWheel.append("circle")
+      .attr("r", wheelRadius)
+      .attr("fill", "none")
+      .attr("stroke", "#ccc");
+
+    svgWheel.selectAll("text")
+      .data(wheelData)
+      .enter()
+      .append("text")
+      .attr("transform", (d, i) => {
+        const angle = angleScale(i + 0.5);
+        const x = Math.sin(angle) * (radiusScale(d.value) + 10);
+        const y = -Math.cos(angle) * (radiusScale(d.value) + 10);
+        return `translate(${x},${y})`;
+      })
+      .attr("dy", "0.35em")
+      .attr("text-anchor", "middle")
+      .text(d => d.category)
+      .style("font-size", "10px");
+
+    // Top 10 countries to live in
+    const topCountries = [
+      "Norway", "Switzerland", "Denmark", "Finland", "Sweden", 
+      "Iceland", "New Zealand", "Australia", "Canada", "Netherlands"
+    ];
+
+    // Function to create indicator buttons
+    function createIndicatorButtons(data) {
+      const container = d3.select("#indicator-buttons");
+
+      // Define the indicators
+      const indicators = [
+        "Adjusted savings: education expenditure (current US$)",
+        "Current health expenditure per capita (current US$)",
+        "GDP per capita (current US$)",
+        "Life Expectancy",
+        "Unemployment, total (% of total labor force) (national estimate)"
+      ];
+
+      container.selectAll("button")
+        .data(indicators)
+        .enter()
+        .append("button")
+        .attr("class", "plot-button")
+        .text(d => d)
+        .on("click", (event, indicator) => plotData(data, indicator));
+    }
+
+    // Function to plot data based on the selected indicator
+    function plotData(data, indicator) {
+      const filteredData = data.filter(d => topCountries.includes(d["Country Name"]));
+
+      // Clear previous plot
+      d3.select("#plot-area").html("");
+
+      // Display the filtered data in a plot
+      createPlot(filteredData, indicator);
+    }
+
+    // Function to create and display the plot
+    function createPlot(data, indicator) {
+      const container = d3.select("#plot-area");
+      const margin = {top: 20, right: 140, bottom: 60, left: 80}; // Increased left margin to accommodate y-axis label
+      const width = container.node().clientWidth - margin.left - margin.right;
+      const height = container.node().clientHeight - margin.top - margin.bottom;
+
+      const svg = container.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+      // Filter out data points where the indicator is 0 or null
+      const filteredData = data.filter(d => d[indicator] != 0 && d[indicator] != null);
+
+      const x = d3.scaleTime()
+        .domain(d3.extent(filteredData, d => new Date(d.Year)))
+        .range([0, width]);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(filteredData, d => +d[indicator])])
+        .nice()
+        .range([height, 0]);
+
+      const xAxis = svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(5));
+
+      const yAxis = svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // Add title and labels
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .attr("font-weight", "bold")
+        .text(indicator);
+
+      svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("text-anchor", "middle")
+        .text("Year");
+
+      svg.append("text")
+        .attr("x", -height / 2)
+        .attr("y", -60)
+        .attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90)")
+        .text(indicator);
+
+      // Group data by country
+      const dataByCountry = d3.groups(filteredData, d => d["Country Name"]);
+
+      // Create a tooltip element
+      const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip");
+
+      dataByCountry.forEach(([country, values], index) => {
+        const line = d3.line()
+          .x(d => x(new Date(d.Year)))
+          .y(d => y(+d[indicator]));
+
+        const path = svg.append("path")
+          .datum(values)
+          .attr("fill", "none")
+          .attr("stroke", color(country))
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+
+        // Add animation
+        const totalLength = path.node().getTotalLength();
+
+        path
+          .attr("stroke-dasharray", `${totalLength} ${totalLength}`)
+          .attr("stroke-dashoffset", totalLength)
+          .transition()
+          .duration(2000)
+          .ease(d3.easeLinear)
+          .attr("stroke-dashoffset", 0);
+
+        // Add circles for data points
+        svg.selectAll(`.data-point-${country.replace(/\s+/g, '-')}`)
+          .data(values)
+          .enter()
+          .append("circle")
+          .attr("class", `data-point-${country.replace(/\s+/g, '-')}`)
+          .attr("cx", d => x(new Date(d.Year)))
+          .attr("cy", d => y(+d[indicator]))
+          .attr("r", 5)
+          .attr("fill", color(country))
+          .on("mouseover", (event, d) => {
+            tooltip.transition().duration(200).style("opacity", 1);
+            tooltip.html(`Country: ${d["Country Name"]}<br>Year: ${d.Year}<br>${indicator}: ${d[indicator]}`)
+              .style("left", `${event.pageX + 5}px`)
+              .style("top", `${event.pageY - 28}px`);
+          })
+          .on("mouseout", () => {
+            tooltip.transition().duration(500).style("opacity", 0);
+          });
+      });
+
+      xAxis.transition()
+        .duration(2000)
+        .call(d3.axisBottom(x).ticks(5));
+
+      yAxis.transition()
+        .duration(2000)
+        .call(d3.axisLeft(y));
+
+      // Add legend
+      const legend = svg.selectAll(".legend")
+        .data(dataByCountry)
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => `translate(0,${i * 20})`);
+
+      legend.append("rect")
+        .attr("x", width + 5)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", d => color(d[0]));
+
+      legend.append("text")
+        .attr("x", width + 25)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "start")
+        .text(d => d[0]);
+    }
+
+    // Load the CSV file and initialize the plot
+    d3.csv("project_data.csv").then(data => {
+      console.log("Data loaded successfully:", data);
+      createIndicatorButtons(data);
+    }).catch(error => {
+      console.error("Error loading data:", error);
+    });
+  </script>
+</body>
+</html>
